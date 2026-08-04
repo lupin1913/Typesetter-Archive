@@ -1618,7 +1618,7 @@ namespace gp{
 				return;
 			}
 			$test = $_COOKIE['cookie_cmd'];
-			if( $test{0} === '?' ){
+			if( $test[0] === '?' ){
 				$test = substr($test,1);
 			}
 

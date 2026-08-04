@@ -132,13 +132,18 @@ class gp_email{
 		if ($bEmulate_imap_8bit)
 		  $sRegExp = '/[^\x20\x21-\x3C\x3E-\x7E]/e';
 
-		$sReplmt = 'sprintf( "=%02X", ord ( "$0" ) ) ;';
-		$sLine = preg_replace( $sRegExp, $sReplmt, $sLine );
+		$sLine = preg_replace_callback(
+	$sRegExp,
+	function($matches){
+		return sprintf("=%02X", ord($matches[0]));
+	},
+	$sLine
+);
 
 		// encode x09,x20 at lineends
 		{
 		  $iLength = strlen($sLine);
-		  $iLastChar = ord($sLine{$iLength-1});
+		  $iLastChar = ord($sLine[$iLength-1]);
 
 		  //              !!!!!!!!
 		  // imap_8_bit does not encode x20 at the very end of a text,
@@ -148,7 +153,7 @@ class gp_email{
 		  if (!($bEmulate_imap_8bit && ($i==count($aLines)-1)))
 
 		  if (($iLastChar==0x09)||($iLastChar==0x20)) {
-			$sLine{$iLength-1}='=';
+			$sLine[$iLength-1]='=';
 			$sLine .= ($iLastChar==0x09)?'09':'20';
 		  }
 		}    // imap_8bit encodes x20 before chr(13), too
